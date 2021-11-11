@@ -1,21 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
     <title>AI - auto Grader</title>
 </head>
+
 <body>
-    <h1>AI Auto Grader</h1>
-    <form action="/predict" method="POST">
-        <!-- <input name="name" type="text" /><br /> -->
-        <textarea name="essay" rows="6" cols="50" placeholder="Enter essay here"></textarea>
+    <main class="container">
+        <h1>AI Auto Grader</h1>
+        <form action="/predict" method="POST">
+            <!-- <input name="name" type="text" /><br /> -->
+            <textarea name="essay" rows="6" cols="50" placeholder="Enter essay here"></textarea>
+            <br />
+            <input type="submit" value="Submit" />
+        </form>
         <br />
-        <input type="submit" value="Submit" />
-    </form>
-    <br />
-    Submitted Essay: {{essay}}<br />
-    <h4 style="text-align: center;">Score is {{score}}/10</h4>
+        <hr />
+        <br />
+        <div>
+            <strong>Submitted Essay</strong>: {{essay}}<br />
+            <h4 style="text-align: center;">Absolute Score: {{score}}/10</h4>
+            <h4 style="text-align: center;">Highest Score: {{highest_score}}/10</h4>
+            <h4 style="text-align: center;">Relative Score: {{relative_score}}/10</h4>
+        </div>
+        <br />
+        <hr />
+        <br />
+        <div>
+            <h1>Detailed Report</h1>
+
+            <h2>Numerical Features</h2>
+            <p>
+                <strong>Word Count: </strong>{{word_count}}<br />
+                <strong>Sentence Count: </strong>{{sent_count}}<br />
+                <strong>Average Word Length: </strong>{{avg_word_len}}<br />
+            </p>
+
+            <hr />
+            <h2>Lemmatization & Part of Speech Tagging</h2>
+            <p>
+                <strong>Lemma count: </strong>{{lemma_count}}<br />
+                <strong>Noun: </strong>{{noun_count}}<br />
+                <strong>Verb: </strong>{{verb_count}}<br />
+                <strong>Adjective: </strong>{{adj_count}}<br />
+                <strong>Adverb: </strong>{{adv_count}}<br />
+            </p>
+
+            <hr />
+            <h2>General Mood - {{general_mood}}</h2>
+            <p>
+                <strong>Positive Score: </strong>{{pos_score}}<br />
+                <strong>Negative Score: </strong>{{neg_score}}<br />
+                <strong>Neutral Score: </strong>{{neu_score}}<br />
+            </p>
+            <hr />
+
+            <h2>Similarity using Latent Semantic Analysis</h2>
+
+            
+        </div>
+    </main>>
 </body>
+
 </html>
+
+<!-- The cyclist “Do Not Exceed Posted Speed Limit” was definatly affected by the setting. He was cycling in California - which is a hot place to begin with - in June - which made it even hotter coming upon a hot desert. When you’re doing a physical activity like that, the last thing you want is to be in the heat. The narrator only brought one bottle of water which at first he was drinking regularly. Then it started to get hot and he was out of water. This affected his body by making him tired, and his mind because he started doubting himself. Then there was the abandon juice building where they made juice. He said “In an ironic twist abandon years earlier had been a Welch’s grape juice factory and bottling plant.” He was dying of thirst and then he found the bottling plant. The cyclist was definatly affected by his surrondings both mental - by saying “I’m going to die.” - and physically by becoming dehydrated. -->
