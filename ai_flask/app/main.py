@@ -182,9 +182,13 @@ def get_tfidf_vectors(essays):
     return feature_names, vectors
 
 
-def LSA(essay):
+def get_LSA_similarity(essay, score):
+    df = pd.DataFrame([[max(data['essay_id'].tolist())+1, essay, score]],
+                      columns=["essay_id", "essay", "domain1_score"])
+    print(df)
+    data2 = data.append(df, ignore_index=True)
 
-    feature_names, vectors_all = get_tfidf_vectors(data['essay'])
+    feature_names, vectors_all = get_tfidf_vectors(data2['essay'])
     print("num of essays X number of features", vectors_all.shape)
 
     # SVD represent documents and terms in vectors
@@ -193,13 +197,20 @@ def LSA(essay):
                              algorithm='randomized', random_state=122)
     lsa = svd_model.fit_transform(vectors_all)
 
-    print(pd.DataFrame(svd_model.components_, index=range(
-        reduced_dim), columns=feature_names))
-
     # Compute document similarity using LSA components
     lsa_similarity = np.asarray(np.asmatrix(lsa) * np.asmatrix(lsa).T)
-    pd.DataFrame(lsa_similarity, index=range(
-        num_essays), columns=range(num_essays))
+
+    similarity_matrix = pd.DataFrame(lsa_similarity, index=range(
+        num_essays+1), columns=range(num_essays+1))
+    print(similarity_matrix)
+
+    similarity_scores = similarity_matrix.loc[reduced_dim -
+                                              1, :].values.flatten().tolist()
+    essays_all = data2['essay'].tolist()
+    combined_essay_scores = zip(similarity_scores, essays_all)
+    top_similar_essays = sorted(combined_essay_scores, reverse=True)[1:5]
+
+    return top_similar_essays
 
 
 def get_cosine_similarity(essay_id):
@@ -269,9 +280,6 @@ def predict_api():
         *features['essay'].map(get_sentiment_tags))
     print("Added 'neg_score', 'pos_score' and 'neu_score' features successfully.")
 
-    # features['cosine_similarity'] = features['essay_id'].apply(get_cosine_similarity)
-    # print("Added 'similarity' feature successfully.")
-
     print(features.iloc[:, 3:])
     score = model.predict(features.iloc[:, 3:])
     highest = max(data['domain1_score'].tolist()) % 11
@@ -283,11 +291,19 @@ def predict_api():
     print(f'Relative Score: {relative_score}')
     print("----------------------------------------")
 
-    e_noun_count, e_adj_count, e_verb_count, e_adv_count = get_pos_counts(essay)
+    e_noun_count, e_adj_count, e_verb_count, e_adv_count = get_pos_counts(
+        essay)
     e_neg_score, e_pos_score, e_neu_score = get_sentiment_tags(essay)
 
-    general_mood = "Neutral"
+    top_similar_essays = get_LSA_similarity(essay, score[0] % 11)
+    sim1percent = top_similar_essays[1][0]*100
+    sim1essay = top_similar_essays[1][1]
+    sim2percent = top_similar_essays[2][0]*100
+    sim2essay = top_similar_essays[2][1]
+    sim3percent = top_similar_essays[3][0]*100
+    sim3essay = top_similar_essays[3][1]
 
+    general_mood = "Neutral"
     if(e_pos_score > e_neg_score and e_pos_score > e_neu_score):
         general_mood = "Positive"
     elif(e_pos_score < e_neg_score and e_neg_score > e_neu_score):
@@ -298,19 +314,25 @@ def predict_api():
                            score=score[0] % 11,
                            highest_score=highest,
                            relative_score=relative_score,
-                           word_count = get_word_count(essay),
-                           sent_count = get_sentence_count(essay),
-                           avg_word_len = get_word_length_average(essay),
-                           lemma_count = get_lemma_count(essay),
-                           spell_err_count = get_spell_error_count(essay),
-                           noun_count = e_noun_count,
-                           adj_count = e_adj_count,
-                           verb_count = e_verb_count,
-                           adv_count = e_adv_count,
-                           neg_score = e_neg_score, 
-                           pos_score = e_pos_score, 
-                           neu_score = e_neu_score,
-                           general_mood = general_mood
+                           word_count=get_word_count(essay),
+                           sent_count=get_sentence_count(essay),
+                           avg_word_len=get_word_length_average(essay),
+                           lemma_count=get_lemma_count(essay),
+                           spell_err_count=get_spell_error_count(essay),
+                           noun_count=e_noun_count,
+                           adj_count=e_adj_count,
+                           verb_count=e_verb_count,
+                           adv_count=e_adv_count,
+                           neg_score=e_neg_score,
+                           pos_score=e_pos_score,
+                           neu_score=e_neu_score,
+                           general_mood=general_mood,
+                           sim1percent=sim1percent,
+                           sim1essay=sim1essay,
+                           sim2percent=sim2percent,
+                           sim2essay=sim2essay,
+                           sim3percent=sim3percent,
+                           sim3essay=sim3essay,
                            )
 
 
