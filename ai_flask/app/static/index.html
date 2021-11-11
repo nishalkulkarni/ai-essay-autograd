@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI - auto Grader</title>
+</head>
+<body>
+    <h1>AI Auto Grader</h1>
+    <form action="/predict" method="POST">
+        <!-- <input name="name" type="text" /><br /> -->
+        <textarea name="essay" rows="6" cols="50" placeholder="Enter essay here"></textarea>
+        <br />
+        <input type="submit" value="Submit" />
+    </form>
+    <br />
+    Submitted Essay: {{essay}}<br />
+    <h4 style="text-align: center;">Score is {{score}}/10</h4>
+</body>
+</html>
